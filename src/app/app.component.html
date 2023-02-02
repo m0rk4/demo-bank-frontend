@@ -1,0 +1,14 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button aria-label="Home button" routerLink="/">
+    <mat-icon>home</mat-icon>
+  </button>
+  <span>Bank</span>
+  <span class="toolbar-spacer"></span>
+  <button mat-fab extended color="accent" routerLink="/clients">
+    <mat-icon>person</mat-icon>
+    Clients
+  </button>
+</mat-toolbar>
+<main>
+  <router-outlet></router-outlet>
+</main>
