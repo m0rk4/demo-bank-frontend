@@ -1,6 +1,6 @@
 <div class="clients-header">
   <h1>Clients</h1>
-  <button mat-fab aria-label="Add button">
+  <button mat-fab aria-label="Add button" (click)="addClient()">
     <mat-icon>add</mat-icon>
   </button>
 </div>
@@ -10,7 +10,8 @@
 
       <ng-container matColumnDef="passportId">
         <th mat-header-cell *matHeaderCellDef>Passport ID</th>
-        <td mat-cell *matCellDef="let element"> {{element.passport.id}} </td>
+        <td mat-cell *matCellDef="let element"><span
+          [matTooltip]="element.passport | json">{{element.passport.passportId}}</span></td>
       </ng-container>
 
       <ng-container matColumnDef="name">
@@ -23,6 +24,16 @@
         <td mat-cell *matCellDef="let element"> {{element.dateOfBirth | date: 'mediumDate'}} </td>
       </ng-container>
 
+      <ng-container matColumnDef="address">
+        <th mat-header-cell *matHeaderCellDef>Address</th>
+        <td mat-cell *matCellDef="let element"> {{element.cityActual.name}}, {{element.address}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="phoneNumber">
+        <th mat-header-cell *matHeaderCellDef>Phone Number</th>
+        <td mat-cell *matCellDef="let element"> +375{{element.phoneNumber}} </td>
+      </ng-container>
+
       <ng-container matColumnDef="sex">
         <th mat-header-cell *matHeaderCellDef>Sex</th>
         <td mat-cell *matCellDef="let element"> {{SEX.MALE === element.sex ? 'Male' : 'Female' }} </td>
@@ -30,34 +41,31 @@
 
       <ng-container matColumnDef="citizenship">
         <th mat-header-cell *matHeaderCellDef>Citizenship</th>
-        <td mat-cell *matCellDef="let element">{{element.citizenshipName}}</td>
+        <td mat-cell *matCellDef="let element">{{element.citizenship.name}}</td>
       </ng-container>
 
       <ng-container matColumnDef="disability">
         <th mat-header-cell *matHeaderCellDef>Disability</th>
-        <td mat-cell *matCellDef="let element">{{element.disabilityName}}</td>
+        <td mat-cell *matCellDef="let element">{{element.disability.name}}</td>
       </ng-container>
 
       <ng-container matColumnDef="maritalStatus">
         <th mat-header-cell *matHeaderCellDef>Marital</th>
-        <td mat-cell *matCellDef="let element">{{element.maritalStatusName}}</td>
+        <td mat-cell *matCellDef="let element">{{element.maritalStatus.name}}</td>
       </ng-container>
 
       <ng-container matColumnDef="isRetired">
         <th mat-header-cell *matHeaderCellDef>Retired</th>
         <td mat-cell *matCellDef="let element">
-          <mat-icon *ngIf="element.isRetired">check</mat-icon>
-          <mat-icon *ngIf="!element.isRetired">clear</mat-icon>
+          <mat-icon *ngIf="element.retired">check</mat-icon>
+          <mat-icon *ngIf="!element.retired">clear</mat-icon>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Actions</th>
         <td mat-cell *matCellDef="let element">
-          <button mat-icon-button aria-label="Open button">
-            <mat-icon>open_in_browser</mat-icon>
-          </button>
-          <button mat-icon-button aria-label="Edit button">
+          <button mat-icon-button aria-label="Edit button" (click)="editClient(element)">
             <mat-icon>edit</mat-icon>
           </button>
           <button mat-icon-button aria-label="Delete button" (click)="deleteClient(element.id)">

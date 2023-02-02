@@ -1,17 +1,25 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
-import { MatPaginator, MatPaginatorModule } from "@angular/material/paginator";
-import { MatTableModule } from "@angular/material/table";
-import { BehaviorSubject, startWith, switchMap } from "rxjs";
-import { CommonModule } from "@angular/common";
-import { Client } from "../models/client";
-import { ClientService } from "../service/client.service";
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { Page } from "../models/page";
-import { UntilDestroy, untilDestroyed } from "@ngneat/until-destroy";
-import { Sex } from "../models/sex.enum";
-import { MatButtonModule } from "@angular/material/button";
-import { MatIconModule } from "@angular/material/icon";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import {AfterViewInit, ChangeDetectionStrategy, Component, ViewChild} from '@angular/core';
+import {MatPaginator, MatPaginatorModule} from "@angular/material/paginator";
+import {MatTableModule} from "@angular/material/table";
+import {BehaviorSubject, catchError, filter, Observable, startWith, switchMap, throwError} from "rxjs";
+import {CommonModule} from "@angular/common";
+import {Client} from "../models/client";
+import {ClientService} from "../service/client.service";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {Page} from "../models/page";
+import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
+import {Sex} from "../models/sex.enum";
+import {MatButtonModule} from "@angular/material/button";
+import {MatIconModule} from "@angular/material/icon";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatDialog, MatDialogModule} from "@angular/material/dialog";
+import {AddClientDialogComponent} from "../add-client-dialog/add-client-dialog.component";
+import {MatTooltipModule} from "@angular/material/tooltip";
+import {UpdateClientDto} from "../models/update-client-dto";
+import {
+  ConfirmationDialogComponent,
+  ConfirmationDialogModel
+} from "../../shared/confirmation-dialog/confirmation-dialog.component";
 
 @UntilDestroy()
 @Component({
@@ -19,8 +27,17 @@ import { MatSnackBar } from "@angular/material/snack-bar";
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MatTableModule, MatPaginatorModule, MatProgressSpinnerModule, MatButtonModule, MatIconModule],
-  providers: [ClientService, MatSnackBar],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDialogModule,
+    MatTooltipModule
+  ],
+  providers: [ClientService, MatSnackBar, MatDialog],
   standalone: true
 })
 export class ClientsComponent implements AfterViewInit {
@@ -31,6 +48,8 @@ export class ClientsComponent implements AfterViewInit {
     'passportId',
     'name',
     'dateOfBirth',
+    'address',
+    'phoneNumber',
     'sex',
     'citizenship',
     'disability',
@@ -45,13 +64,14 @@ export class ClientsComponent implements AfterViewInit {
   });
   readonly SEX = Sex;
 
-  constructor(private clientService: ClientService, private snackBar: MatSnackBar) {}
+  constructor(private clientService: ClientService, private snackBar: MatSnackBar, private dialog: MatDialog) {
+  }
 
   ngAfterViewInit(): void {
     if (this.paginator === undefined) throw new Error("Paginator wasn't initialized!");
 
     this.paginator.page.pipe(
-      startWith({ pageIndex: 0, pageSize: this.pageSizeOptions[0] }),
+      startWith({pageIndex: 0, pageSize: this.pageSizeOptions[0]}),
       switchMap(event => this.clientService.getClients(event.pageIndex, event.pageSize)),
       untilDestroyed(this)
     ).subscribe(page => this.page$.next(page));
@@ -62,9 +82,57 @@ export class ClientsComponent implements AfterViewInit {
   }
 
   deleteClient(clientId: number): void {
-    this.clientService.deleteClient(clientId).pipe(untilDestroyed(this)).subscribe(() => {
-      this.snackBar.open('Client was deleted successfully.')
-      this.paginator?.page?.emit()
+    this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogModel, boolean>(ConfirmationDialogComponent, {
+      data: {title: "Confirm Action", message: 'Are you sure you want to do this?'}
+    }).afterClosed()
+      .pipe(
+        filter(it => !!it),
+        switchMap(() => this.clientService.deleteClient(clientId)),
+        untilDestroyed(this)
+      )
+      .subscribe(() => {
+        this.snackBar.open('Client was deleted successfully.');
+        this.paginator?.page?.emit({pageIndex: 0, pageSize: this.pageSizeOptions[0], length: 0});
+      });
+  }
+
+  addClient(): void {
+    this.dialog.open<AddClientDialogComponent, undefined, any | null>(AddClientDialogComponent).afterClosed().pipe(
+      filter(dto => !!dto),
+      switchMap(dto =>
+        this.createOrUpdateClient(dto).pipe(catchError(err => throwError(err.error.message)))),
+      untilDestroyed(this)
+    ).subscribe({
+      next: () => {
+        this.snackBar.open('Client was saved successfully.', 'Ok', {duration: 3000});
+        this.paginator?.page?.emit({pageIndex: 0, pageSize: this.pageSizeOptions[0], length: 0});
+      },
+      error: errorMessage => this.snackBar.open(errorMessage, 'Ok', {duration: 3000})
     });
+  }
+
+  editClient(client: Client): void {
+    this.dialog.open<AddClientDialogComponent, Client, any | null>(AddClientDialogComponent, {data: client})
+      .afterClosed()
+      .pipe(
+        filter(dto => !!dto),
+        switchMap(dto =>
+          this.createOrUpdateClient(dto, client.id).pipe(catchError(err => throwError(err.error.message)))),
+        untilDestroyed(this)
+      )
+      .subscribe({
+        next: () => {
+          this.snackBar.open('Client was updated successfully.', 'Ok', {duration: 3000});
+          this.paginator?.page?.emit({pageIndex: 0, pageSize: this.pageSizeOptions[0], length: 0});
+        },
+        error: errorMessage => this.snackBar.open(errorMessage, 'Ok', {duration: 3000})
+      });
+  }
+
+  private createOrUpdateClient(dto: UpdateClientDto, id: number | undefined = undefined): Observable<Client> {
+    if (id) {
+      return this.clientService.updateClient(id, dto);
+    }
+    return this.clientService.addClient(dto);
   }
 }

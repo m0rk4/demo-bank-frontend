@@ -1,0 +1,203 @@
+<h1 mat-dialog-title>{{initialValue ? 'Update' : 'Add'}} client</h1>
+<div mat-dialog-content>
+  <form [formGroup]="form" class="form" *ngIf="citiesDisabilitiesCitizenshipsMaritalStatuses$ | async as vm">
+    <mat-form-field appearance="outline">
+      <mat-label>Firstname</mat-label>
+      <input autocomplete="off" matInput placeholder="Firstname" formControlName="firstname"
+             mask="n*" [patterns]="NAME_PATTERNS">
+      <mat-error *ngIf="form.controls.firstname.hasError('required')">This field is required.</mat-error>
+      <mat-error *ngIf="form.controls.firstname.hasError('maxlength')">Max length of 255 exceeded.</mat-error>
+      <mat-error *ngIf="form.controls.firstname.hasError('pattern')">Only letters are allowed.</mat-error>
+      <mat-error *ngIf="!form.controls.firstname.hasError('required') && form.controls.firstname.hasError('blank')">
+        This field is blank.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Lastname</mat-label>
+      <input autocomplete="off" matInput placeholder="Lastname" formControlName="lastname" mask="n*"
+             [patterns]="NAME_PATTERNS">
+      <mat-error *ngIf="form.controls.lastname.hasError('required')">This field is required.</mat-error>
+      <mat-error *ngIf="form.controls.lastname.hasError('maxlength')">Max length of 255 exceeded.</mat-error>
+      <mat-error *ngIf="form.controls.lastname.hasError('pattern')">Only letters are allowed.</mat-error>
+      <mat-error *ngIf="!form.controls.lastname.hasError('required') && form.controls.lastname.hasError('blank')">
+        This field is blank.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Patronymic</mat-label>
+      <input autocomplete="off" matInput placeholder="Patronymic" formControlName="patronymic" mask="n*"
+             [patterns]="NAME_PATTERNS">
+      <mat-error *ngIf="form.controls.patronymic.hasError('required')">This field is required.</mat-error>
+      <mat-error *ngIf="form.controls.patronymic.hasError('maxlength')">Max length of 255 exceeded.</mat-error>
+      <mat-error *ngIf="form.controls.patronymic.hasError('pattern')">Only letters are allowed.</mat-error>
+      <mat-error *ngIf="!form.controls.patronymic.hasError('required') && form.controls.patronymic.hasError('blank')">
+        This field is blank.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Date of Birth</mat-label>
+      <input autocomplete="off" readonly matInput [matDatepicker]="picker" placeholder="MM/DD/YYYY"
+             [max]="MAX_DATE" [min]="MIN_DATE" formControlName="dateOfBirth">
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="form.controls.dateOfBirth.hasError('required')">This field is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input autocomplete="off" matInput placeholder="Email" formControlName="email">
+      <mat-error *ngIf="form.controls.email.hasError('email')">Not a valid email.</mat-error>
+    </mat-form-field>
+    <mat-radio-group formControlName="sex" aria-label="Select an option">
+      <mat-radio-button [value]="SEX.MALE">Male</mat-radio-button>
+      <mat-radio-button [value]="SEX.FEMALE">Female</mat-radio-button>
+    </mat-radio-group>
+    <mat-form-field appearance="outline">
+      <mat-label>Home phone number</mat-label>
+      <input autocomplete="off" prefix="8-0"
+             mask="0000-0-00-00" matInput placeholder="Home phone number" formControlName="phoneNumberHome">
+      <mat-error *ngIf="form.controls.phoneNumberHome.hasError('required')">This field is required.</mat-error>
+      <mat-error
+        *ngIf="!form.controls.phoneNumberHome.hasError('required') && form.controls.phoneNumberHome.hasError('length')">
+        Not a valid home phone number.
+      </mat-error>
+      <mat-error *ngIf="form.controls.phoneNumberHome.hasError('format')">Not a valid home phone number.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Phone number</mat-label>
+      <input autocomplete="off" prefix="+375 " mask="(00) 000 00 00" matInput placeholder="Phone number"
+             formControlName="phoneNumber">
+      <mat-error *ngIf="form.controls.phoneNumber.hasError('required')">This field is required.</mat-error>
+      <mat-error
+        *ngIf="!form.controls.phoneNumber.hasError('required') && form.controls.phoneNumber.hasError('length')">
+        Not a valid phone number.
+      </mat-error>
+      <mat-error *ngIf="form.controls.phoneNumber.hasError('code')">Not a valid operator code.</mat-error>
+    </mat-form-field>
+    <mat-checkbox formControlName="retired">Is Retired</mat-checkbox>
+    <mat-form-field appearance="outline">
+      <mat-label>City</mat-label>
+      <mat-select formControlName="cityActualId">
+        <mat-option *ngFor="let city of vm.cities" [value]="city.id">
+          {{city.name}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.controls.cityActualId.hasError('required')">This field is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Address</mat-label>
+      <input type="text" autocomplete="off" matInput placeholder="Address" formControlName="address">
+      <mat-error *ngIf="form.controls.address.hasError('required')">This field is required.</mat-error>
+      <mat-error *ngIf="form.controls.address.hasError('maxlength')">Max length of 255 exceeded.</mat-error>
+      <mat-error *ngIf="!form.controls.address.hasError('required') && form.controls.address.hasError('blank')">
+        This field is blank.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Monthly Income</mat-label>
+      <input autocomplete="off" type="number" matInput placeholder="Monthly Income" formControlName="monthlyIncome">
+      <mat-error *ngIf="form.controls.monthlyIncome.hasError('min')">This field can't be negative.</mat-error>
+      <mat-error *ngIf="form.controls.monthlyIncome.hasError('max')">
+        Exceeded {{MAX_MONTHLY_INCOME / 100}} BYN.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Disability</mat-label>
+      <mat-select formControlName="disabilityId">
+        <mat-option *ngFor="let disability of vm.disabilities" [value]="disability.id">
+          {{disability.name}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.controls.disabilityId.hasError('required')">This field is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Citizenship</mat-label>
+      <mat-select formControlName="citizenshipId">
+        <mat-option *ngFor="let citizenship of vm.citizenships" [value]="citizenship.id">
+          {{citizenship.name}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.controls.citizenshipId.hasError('required')">This field is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Marital Status</mat-label>
+      <mat-select formControlName="maritalStatusId">
+        <mat-option *ngFor="let maritalStatus of vm.maritalStatuses" [value]="maritalStatus.id">
+          {{maritalStatus.name}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.controls.maritalStatusId.hasError('required')">This field is required.</mat-error>
+    </mat-form-field>
+    <mat-divider class="divider"></mat-divider>
+    <mat-form-field appearance="outline">
+      <mat-label>Passport ID</mat-label>
+      <input autocomplete="off" matInput placeholder="Passport ID" formControlName="passportId"
+             [patterns]="PASSPORT_ID_PATTERNS"
+             [validation]="true"
+             mask="f000000o000xx0">
+      <mat-error *ngIf="form.controls.passportId.hasError('required')">This field is required.</mat-error>
+      <mat-error *ngIf="!form.controls.passportId.hasError('required') && form.controls.passportId.hasError('length')">
+        Not a valid Passport ID.
+      </mat-error>
+      <mat-error *ngIf="form.controls.passportId.hasError('dob')">Not a valid date of birth.</mat-error>
+      <mat-error *ngIf="form.controls.passportId.hasError('citizenship')">Not a valid citizenship.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Passport Series</mat-label>
+      <input autocomplete="off" matInput placeholder="Passport Series" formControlName="passportSeries" mask="UU">
+      <mat-error *ngIf="form.controls.passportSeries.hasError('required')">This field is required.</mat-error>
+      <mat-error *ngIf="form.controls.passportSeries.hasError('pattern')">{{PASSPORT_REGIONS.join(' ')}}</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Passport Number</mat-label>
+      <input autocomplete="off" matInput placeholder="Passport Number" formControlName="passportNumber" mask="0000000">
+      <mat-error *ngIf="form.controls.passportNumber.hasError('required')">This field is required.</mat-error>
+      <mat-error *ngIf="form.controls.passportNumber.hasError('maxlength')">Not a valid passport #.</mat-error>
+      <mat-error *ngIf="form.controls.passportNumber.hasError('minlength')">Not a valid passport #.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Passport Issuer</mat-label>
+      <input autocomplete="off" matInput placeholder="Passport Issuer" formControlName="passportIssuer">
+      <mat-error *ngIf="form.controls.passportIssuer.hasError('required')">This field is required.</mat-error>
+      <mat-error *ngIf="form.controls.passportIssuer.hasError('maxlength')">Max length of 255 exceeded.</mat-error>
+      <mat-error
+        *ngIf="!form.controls.passportIssuer.hasError('required') && form.controls.passportIssuer.hasError('blank')">
+        This field is blank.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Passport Issued Date</mat-label>
+      <input autocomplete="off" readonly matInput [matDatepicker]="pickerPassport" placeholder="MM/DD/YYYY"
+             [max]="MAX_DATE" [min]="MIN_DATE" formControlName="passportIssuedDate">
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="pickerPassport"></mat-datepicker-toggle>
+      <mat-datepicker #pickerPassport></mat-datepicker>
+      <mat-error *ngIf="form.controls.passportIssuedDate.hasError('required')">This field is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Passport Address</mat-label>
+      <input autocomplete="off" matInput placeholder="Passport Address" formControlName="passportAddress">
+      <mat-error *ngIf="form.controls.passportAddress.hasError('required')">This field is required.</mat-error>
+      <mat-error *ngIf="form.controls.passportAddress.hasError('maxlength')">Max length of 255 exceeded.</mat-error>
+      <mat-error
+        *ngIf="!form.controls.passportAddress.hasError('required') && form.controls.passportAddress.hasError('blank')">
+        This field is blank.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field class="place-of-birth" appearance="outline">
+      <mat-label>Place of Birth</mat-label>
+      <input autocomplete="off" matInput placeholder="Place of Birth" formControlName="placeOfBirth">
+      <mat-error *ngIf="form.controls.placeOfBirth.hasError('required')">This field is required.</mat-error>
+      <mat-error *ngIf="form.controls.placeOfBirth.hasError('maxlength')">Max length of 255 exceeded.</mat-error>
+      <mat-error
+        *ngIf="!form.controls.placeOfBirth.hasError('required') && form.controls.placeOfBirth.hasError('blank')">
+        This field is blank.
+      </mat-error>
+    </mat-form-field>
+  </form>
+
+</div>
+<div mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="null">Cancel</button>
+  <button mat-button (click)="save()" cdkFocusInitial [disabled]="form.invalid">Save</button>
+</div>
