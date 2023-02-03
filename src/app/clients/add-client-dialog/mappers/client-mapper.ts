@@ -1,6 +1,6 @@
-import {UpdateClientDto} from "../../models/update-client-dto";
-import {UpdateClientFormValue} from "../add-client-dialog.component";
-import {Client} from "../../models/client";
+import { UpdateClientDto } from "../../models/update-client-dto";
+import { UpdateClientFormValue } from "../add-client-dialog.component";
+import { Client } from "../../models/client";
 
 export class ClientMapper {
 
@@ -18,7 +18,7 @@ export class ClientMapper {
       maritalStatusId: formValue.maritalStatusId,
       address: formValue.address,
       disabilityId: formValue.disabilityId,
-      email: formValue.email,
+      email: formValue.email?.trim()?.length === 0 ? null : formValue.email!!.trim(),
       retired: formValue.retired,
       monthlyIncome: formValue.monthlyIncome,
       passport: {
