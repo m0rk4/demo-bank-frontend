@@ -1,29 +1,31 @@
-import {ChangeDetectionStrategy, Component, Inject} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from "@angular/material/dialog";
-import {MatButtonModule} from "@angular/material/button";
-import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
-import {MatFormFieldModule} from "@angular/material/form-field";
-import {MatInputModule} from "@angular/material/input";
-import {MatDatepickerModule} from "@angular/material/datepicker";
-import {MatRadioModule} from "@angular/material/radio";
-import {Sex} from "../models/sex.enum";
-import {NgxMaskDirective, provideNgxMask} from "ngx-mask";
-import {MatCheckboxModule} from "@angular/material/checkbox";
-import {MatSelectModule} from "@angular/material/select";
-import {CommonModule} from "@angular/common";
-import {MatDividerModule} from "@angular/material/divider";
-import {PassportIdValidator} from "./validators/passport-id.validator";
-import {MobilePhoneNumberValidator} from "./validators/mobile-phone-number-validator";
-import {UpdateClientDto} from "../models/update-client-dto";
-import {Client} from "../models/client";
-import {ClientMapper} from "./mappers/client-mapper";
-import {TextValidators} from "./validators/text-validators";
-import {ClientService} from "../service/client.service";
-import {forkJoin, map, Observable} from "rxjs";
-import {City} from "../models/city";
-import {Disability} from "../models/disability";
-import {Citizenship} from "../models/citizenship";
-import {MaritalStatus} from "../models/marital-status";
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
+import { MatButtonModule } from "@angular/material/button";
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from "@angular/forms";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatRadioModule } from "@angular/material/radio";
+import { Sex } from "../models/sex.enum";
+import { NgxMaskDirective, provideNgxMask } from "ngx-mask";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatSelectModule } from "@angular/material/select";
+import { CommonModule } from "@angular/common";
+import { MatDividerModule } from "@angular/material/divider";
+import { PassportIdValidator } from "./validators/passport-id.validator";
+import { MobilePhoneNumberValidator } from "./validators/mobile-phone-number-validator";
+import { UpdateClientDto } from "../models/update-client-dto";
+import { Client } from "../models/client";
+import { ClientMapper } from "./mappers/client-mapper";
+import { TextValidators } from "./validators/text-validators";
+import { ClientService } from "../service/client.service";
+import { asyncScheduler, forkJoin, map, Observable } from "rxjs";
+import { City } from "../models/city";
+import { Disability } from "../models/disability";
+import { Citizenship } from "../models/citizenship";
+import { MaritalStatus } from "../models/marital-status";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { ErrorCode } from "../../shared/models/error-code";
 
 export type UpdateClientFormValue = {
   firstname: string;
@@ -72,7 +74,8 @@ export type UpdateClientFormValue = {
   ],
   providers: [
     provideNgxMask(),
-    ClientService
+    ClientService,
+    MatSnackBar
   ]
 })
 export class AddClientDialogComponent {
@@ -82,13 +85,13 @@ export class AddClientDialogComponent {
   readonly SEX = Sex;
   readonly PASSPORT_REGIONS = ['AB', 'BM', 'HB', 'KH', 'MP', 'MC', 'KB', 'PP', 'SP', 'DP'];
   readonly PASSPORT_ID_PATTERNS = {
-    'f': {pattern: new RegExp('\[1-6\]')},
-    '0': {pattern: new RegExp('\\d')},
-    'o': {pattern: new RegExp('\[ABCKEMH\]')},
-    'x': {pattern: new RegExp('\[PBAI\]')}
+    'f': { pattern: new RegExp('\[1-6\]') },
+    '0': { pattern: new RegExp('\\d') },
+    'o': { pattern: new RegExp('\[ABCKEMH\]') },
+    'x': { pattern: new RegExp('\[PBAI\]') }
   };
   readonly NAME_PATTERNS = {
-    'n': {pattern: new RegExp('\[a-zA-Zа-яА-ЯёЁ\]+')}
+    'n': { pattern: new RegExp('\[a-zA-Zа-яА-ЯёЁ\]+') }
   };
 
   form = this.formBuilder.group({
@@ -122,7 +125,7 @@ export class AddClientDialogComponent {
       nonNullable: true,
       validators: [Validators.required]
     }),
-    email: this.formBuilder.control('', {validators: [Validators.email]}),
+    email: this.formBuilder.control('', { validators: [Validators.email] }),
     sex: this.formBuilder.control(Sex.MALE, {
       nonNullable: true,
       validators: [Validators.required]
@@ -212,9 +215,10 @@ export class AddClientDialogComponent {
     }))
   );
 
-  constructor(private clientService: ClientService,
+  constructor(private snackBar: MatSnackBar,
+              private clientService: ClientService,
               private formBuilder: FormBuilder,
-              private dialogRef: MatDialogRef<AddClientDialogComponent, UpdateClientDto | null>,
+              private dialogRef: MatDialogRef<AddClientDialogComponent, Client | null>,
               @Inject(MAT_DIALOG_DATA) private client: Client | undefined) {
     if (client) {
       this.form.setValue(ClientMapper.toForm(client));
@@ -223,6 +227,45 @@ export class AddClientDialogComponent {
   }
 
   save(): void {
-    this.dialogRef.close(ClientMapper.toDto(this.form.getRawValue()));
+    const dto = ClientMapper.toDto(this.form.getRawValue());
+    this.createOrUpdateClient(dto, this.client?.id).subscribe({
+      next: saved => this.dialogRef.close(saved),
+      error: err => {
+        this.snackBar.open(err.error.message, 'Ok', { duration: 3000 })
+        this.handleError(err);
+      }
+    })
+  }
+
+  private handleError(err: any): void {
+    const code: ErrorCode | undefined = err.error.code;
+    switch (code) {
+      case ErrorCode.EMAIL_EXISTS:
+        this.form.controls.email.setErrors({ exists: true });
+        this.scheduleElementFocus('email', this.form.controls.email);
+        break;
+      case ErrorCode.PASSPORT_ID_EXISTS:
+        this.form.controls.passportId.setErrors({ exists: true });
+        this.scheduleElementFocus('id', this.form.controls.passportId);
+        break;
+      case ErrorCode.PASSPORT_NUMBER_EXISTS:
+        this.form.controls.passportNumber.setErrors({ exists: true });
+        this.scheduleElementFocus('number', this.form.controls.passportNumber);
+        break;
+    }
+  }
+
+  private scheduleElementFocus(elementId: string, control: FormControl<unknown>): void {
+    asyncScheduler.schedule(() => {
+      document.getElementById(elementId)?.focus();
+      control.markAsPristine();
+    });
+  }
+
+  private createOrUpdateClient(dto: UpdateClientDto, id: number | undefined = undefined): Observable<Client> {
+    if (id) {
+      return this.clientService.updateClient(id, dto);
+    }
+    return this.clientService.addClient(dto);
   }
 }

@@ -18,7 +18,7 @@ export class ClientMapper {
       maritalStatusId: formValue.maritalStatusId,
       address: formValue.address,
       disabilityId: formValue.disabilityId,
-      email: formValue.email?.trim()?.length === 0 ? null : formValue.email!!.trim(),
+      email: formValue.email?.trim()?.length === 0 ? null : formValue.email?.trim() ?? null,
       retired: formValue.retired,
       monthlyIncome: formValue.monthlyIncome,
       passport: {

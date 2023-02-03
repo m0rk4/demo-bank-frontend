@@ -45,8 +45,9 @@
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Email</mat-label>
-      <input autocomplete="off" matInput placeholder="Email" formControlName="email">
+      <input id="email" autocomplete="off" matInput placeholder="Email" formControlName="email">
       <mat-error *ngIf="form.controls.email.hasError('email')">Not a valid email.</mat-error>
+      <mat-error *ngIf="form.controls.email.hasError('exists')">Email already exists.</mat-error>
     </mat-form-field>
     <mat-radio-group formControlName="sex" aria-label="Select an option">
       <mat-radio-button [value]="SEX.MALE">Male</mat-radio-button>
@@ -131,7 +132,7 @@
     <mat-divider class="divider"></mat-divider>
     <mat-form-field appearance="outline">
       <mat-label>Passport ID</mat-label>
-      <input autocomplete="off" matInput placeholder="Passport ID" formControlName="passportId"
+      <input id="id" autocomplete="off" matInput placeholder="Passport ID" formControlName="passportId"
              [patterns]="PASSPORT_ID_PATTERNS"
              [validation]="true"
              mask="f000000o000xx0">
@@ -141,6 +142,7 @@
       </mat-error>
       <mat-error *ngIf="form.controls.passportId.hasError('dob')">Not a valid date of birth.</mat-error>
       <mat-error *ngIf="form.controls.passportId.hasError('citizenship')">Not a valid citizenship.</mat-error>
+      <mat-error *ngIf="form.controls.passportId.hasError('exists')">Passport with such ID already exists.</mat-error>
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Passport Series</mat-label>
@@ -150,10 +152,12 @@
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Passport Number</mat-label>
-      <input autocomplete="off" matInput placeholder="Passport Number" formControlName="passportNumber" mask="0000000">
+      <input id="number" autocomplete="off" matInput placeholder="Passport Number" formControlName="passportNumber" mask="0000000">
       <mat-error *ngIf="form.controls.passportNumber.hasError('required')">This field is required.</mat-error>
       <mat-error *ngIf="form.controls.passportNumber.hasError('maxlength')">Not a valid passport #.</mat-error>
       <mat-error *ngIf="form.controls.passportNumber.hasError('minlength')">Not a valid passport #.</mat-error>
+      <mat-error *ngIf="form.controls.passportNumber.hasError('exists')">Such number already exists.
+      </mat-error>
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Passport Issuer</mat-label>
