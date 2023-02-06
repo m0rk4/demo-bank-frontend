@@ -5,6 +5,7 @@ import { environment } from "../../../environments/environment";
 import { DepositType } from "../model/deposit-type";
 import { DepositCurrency } from "../model/deposit-currency";
 import { Page } from "../../shared/models/page";
+import { AddDepositAgreementDto } from "../model/add-deposit-agreement-dto";
 
 @Injectable()
 export class DepositService {
@@ -20,7 +21,7 @@ export class DepositService {
       `${environment.apiUrl}/deposit-currencies/by-deposit-type?depositTypeId=${depositTypeId}`);
   }
 
-  createAgreement(dto: any): Observable<any> {
-    return this.httpClient.post<any>(`${environment.apiUrl}/deposit-agreements`, dto);
+  createAgreement(dto: AddDepositAgreementDto): Observable<void> {
+    return this.httpClient.post<void>(`${environment.apiUrl}/deposit-agreements`, dto);
   }
 }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from "@angular/common";
-import { MatDialogModule } from "@angular/material/dialog";
+import { MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { MatButtonModule } from "@angular/material/button";
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from "@angular/forms";
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -25,6 +25,8 @@ import { UntilDestroy, untilDestroyed } from "@ngneat/until-destroy";
 import { MatTableModule } from "@angular/material/table";
 import { AccountMapper } from "../mappers/account-mapper";
 import { DateUtils } from "../../shared/utils/date-utils";
+import { ErrorCode } from "../../shared/models/error-code";
+import { FormUtils } from "../../shared/utils/form-utils";
 
 export type AddDepositFormValue = {
   clientId: number;
@@ -106,9 +108,11 @@ export class AddDepositDialogComponent implements OnInit {
   readonly MAX_DATE = new Date(this.MIN_DATE.getTime() + 30 * 86400000);
   readonly DEPOSIT_CURRENCY_COLUMNS = ['currency', 'capitalization', 'period', 'minDepositSize', 'percent', 'revocable'];
 
-  constructor(private depositService: DepositService,
+  constructor(private dialogRef: MatDialogRef<AddDepositDialogComponent>,
+              private depositService: DepositService,
               private clientService: ClientService,
-              private formBuilder: FormBuilder) {
+              private formBuilder: FormBuilder,
+              private snackBar: MatSnackBar) {
     this.clients$ = this.clientsPage$.pipe(
       switchMap(page => this.clientService.getClients(page, 6)),
       scan<Page<Client>, { clients: Client[], total: number }>((acc, curr) =>
@@ -184,8 +188,14 @@ export class AddDepositDialogComponent implements OnInit {
     const formValue: AddDepositFormValue = this.form.getRawValue();
     this.depositService.createAgreement(AccountMapper.toAgreementDto(formValue)).pipe(untilDestroyed(this))
       .subscribe({
-        next: agreement => console.log(agreement),
-        error: err => console.error(err)
+        next: () => this.dialogRef.close(),
+        error: err => {
+          this.snackBar.open(err.error.message, 'Ok', { duration: 3000 })
+          if (err.error.code === ErrorCode.DEPOSIT_AGREEMENT_NUMBER_EXISTS) {
+            this.form.controls.number.setErrors({ exists: true });
+            FormUtils.scheduleElementFocus('agreement-number', this.form.controls.number);
+          }
+        }
       });
   }
 }

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { MatButtonModule } from "@angular/material/button";
-import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from "@angular/forms";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatDatepickerModule } from "@angular/material/datepicker";
@@ -19,13 +19,14 @@ import { Client } from "../models/client";
 import { ClientMapper } from "./mappers/client-mapper";
 import { TextValidators } from "./validators/text-validators";
 import { ClientService } from "../service/client.service";
-import { asyncScheduler, forkJoin, map, Observable } from "rxjs";
+import { forkJoin, map, Observable } from "rxjs";
 import { City } from "../models/city";
 import { Disability } from "../models/disability";
 import { Citizenship } from "../models/citizenship";
 import { MaritalStatus } from "../models/marital-status";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ErrorCode } from "../../shared/models/error-code";
+import { FormUtils } from "../../shared/utils/form-utils";
 
 export type UpdateClientFormValue = {
   firstname: string;
@@ -242,24 +243,17 @@ export class AddClientDialogComponent {
     switch (code) {
       case ErrorCode.EMAIL_EXISTS:
         this.form.controls.email.setErrors({ exists: true });
-        this.scheduleElementFocus('email', this.form.controls.email);
+        FormUtils.scheduleElementFocus('email', this.form.controls.email);
         break;
       case ErrorCode.PASSPORT_ID_EXISTS:
         this.form.controls.passportId.setErrors({ exists: true });
-        this.scheduleElementFocus('id', this.form.controls.passportId);
+        FormUtils.scheduleElementFocus('id', this.form.controls.passportId);
         break;
       case ErrorCode.PASSPORT_NUMBER_EXISTS:
         this.form.controls.passportNumber.setErrors({ exists: true });
-        this.scheduleElementFocus('number', this.form.controls.passportNumber);
+        FormUtils.scheduleElementFocus('number', this.form.controls.passportNumber);
         break;
     }
-  }
-
-  private scheduleElementFocus(elementId: string, control: FormControl<unknown>): void {
-    asyncScheduler.schedule(() => {
-      document.getElementById(elementId)?.focus();
-      control.markAsPristine();
-    });
   }
 
   private createOrUpdateClient(dto: UpdateClientDto, id: number | undefined = undefined): Observable<Client> {

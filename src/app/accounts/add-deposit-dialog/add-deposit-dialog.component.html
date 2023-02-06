@@ -57,10 +57,11 @@
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Agreement number</mat-label>
-        <input autocomplete="off" matInput placeholder="Agreement number" formControlName="number" mask="0{9}">
+        <input id="agreement-number" autocomplete="off" matInput placeholder="Agreement number" formControlName="number" mask="0{9}">
         <mat-error *ngIf="form.controls.number.hasError('required')">This field is required.</mat-error>
         <mat-error *ngIf="form.controls.number.hasError('minlength')">Not a valid agreement number</mat-error>
         <mat-error *ngIf="form.controls.number.hasError('maxlength')">Not a valid agreement number</mat-error>
+        <mat-error *ngIf="form.controls.number.hasError('exists')">Already exists.</mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Start date</mat-label>
@@ -116,6 +117,6 @@
   </form>
 </div>
 <div mat-dialog-actions>
-  <button mat-button>Cancel</button>
+  <button mat-button [mat-dialog-close]="null">Cancel</button>
   <button mat-button [disabled]="form.invalid" (click)="save()">Save</button>
 </div>
