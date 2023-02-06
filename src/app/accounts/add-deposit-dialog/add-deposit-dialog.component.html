@@ -30,7 +30,8 @@
       <mat-error *ngIf="form.controls.depositType.hasError('required')">This field is required.</mat-error>
     </mat-form-field>
 
-    <div class="description">{{form.controls.depositType.value?.description}}</div>
+    <div
+      class="description">{{form.controls.depositType.value?.description ?? 'Please select deposit type to view possible options.'}}</div>
 
     <ng-container *ngIf="depositCurrencies$ | async as depositCurrencies">
       <mat-form-field appearance="outline">
@@ -57,7 +58,8 @@
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Agreement number</mat-label>
-        <input id="agreement-number" autocomplete="off" matInput placeholder="Agreement number" formControlName="number" mask="0{9}">
+        <input id="agreement-number" autocomplete="off" matInput placeholder="Agreement number" formControlName="number"
+               mask="0{9}">
         <mat-error *ngIf="form.controls.number.hasError('required')">This field is required.</mat-error>
         <mat-error *ngIf="form.controls.number.hasError('minlength')">Not a valid agreement number</mat-error>
         <mat-error *ngIf="form.controls.number.hasError('maxlength')">Not a valid agreement number</mat-error>
