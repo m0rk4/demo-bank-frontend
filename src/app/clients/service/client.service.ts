@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Client} from "../models/client";
-import {Page} from "../models/page";
+import {Page} from "../../shared/models/page";
 import {environment} from "../../../environments/environment";
 import {UpdateClientDto} from "../models/update-client-dto";
 import {City} from "../models/city";

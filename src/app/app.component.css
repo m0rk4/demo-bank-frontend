@@ -5,3 +5,8 @@
 main {
   padding: 0 8rem;
 }
+
+.buttons-navigation {
+  display: flex;
+  gap: 1rem;
+}

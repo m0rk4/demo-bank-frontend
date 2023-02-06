@@ -4,10 +4,16 @@
   </button>
   <span>Bank</span>
   <span class="toolbar-spacer"></span>
-  <button mat-fab extended color="accent" routerLink="/clients">
-    <mat-icon>person</mat-icon>
-    Clients
-  </button>
+  <div class="buttons-navigation">
+    <button mat-fab extended color="accent" routerLink="/accounts">
+      <mat-icon>view_headline</mat-icon>
+      Accounts
+    </button>
+    <button mat-fab extended color="accent" routerLink="/clients">
+      <mat-icon>person</mat-icon>
+      Clients
+    </button>
+  </div>
 </mat-toolbar>
 <main>
   <router-outlet></router-outlet>

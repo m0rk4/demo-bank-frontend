@@ -1,12 +1,11 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from "@angular/material/paginator";
 import { MatTableModule } from "@angular/material/table";
-import { BehaviorSubject, filter, Observable, startWith, switchMap } from "rxjs";
+import { BehaviorSubject, filter, startWith, switchMap } from "rxjs";
 import { CommonModule } from "@angular/common";
 import { Client } from "../models/client";
 import { ClientService } from "../service/client.service";
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { Page } from "../models/page";
+import { Page } from "../../shared/models/page";
 import { UntilDestroy, untilDestroyed } from "@ngneat/until-destroy";
 import { Sex } from "../models/sex.enum";
 import { MatButtonModule } from "@angular/material/button";
@@ -15,7 +14,6 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { AddClientDialogComponent } from "../add-client-dialog/add-client-dialog.component";
 import { MatTooltipModule } from "@angular/material/tooltip";
-import { UpdateClientDto } from "../models/update-client-dto";
 import {
   ConfirmationDialogComponent,
   ConfirmationDialogModel
@@ -31,7 +29,6 @@ import {
     CommonModule,
     MatTableModule,
     MatPaginatorModule,
-    MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
@@ -114,12 +111,5 @@ export class ClientsComponent implements AfterViewInit {
         next: () => this.paginator?.page?.emit({ pageIndex: 0, pageSize: this.pageSizeOptions[0], length: 0 }),
         error: errorMessage => this.snackBar.open(errorMessage, 'Ok', { duration: 3000 })
       });
-  }
-
-  private createOrUpdateClient(dto: UpdateClientDto, id: number | undefined = undefined): Observable<Client> {
-    if (id) {
-      return this.clientService.updateClient(id, dto);
-    }
-    return this.clientService.addClient(dto);
   }
 }

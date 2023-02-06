@@ -1,6 +1,7 @@
 import { UpdateClientDto } from "../../models/update-client-dto";
 import { UpdateClientFormValue } from "../add-client-dialog.component";
 import { Client } from "../../models/client";
+import { DateUtils } from "../../../shared/utils/date-utils";
 
 export class ClientMapper {
 
@@ -9,7 +10,7 @@ export class ClientMapper {
       firstname: formValue.firstname,
       lastname: formValue.lastname,
       patronymic: formValue.patronymic,
-      dateOfBirth: ClientMapper.formatDate(formValue.dateOfBirth),
+      dateOfBirth: DateUtils.formatDate(formValue.dateOfBirth),
       phoneNumber: formValue.phoneNumber,
       phoneNumberHome: formValue.phoneNumberHome,
       citizenshipId: formValue.citizenshipId,
@@ -22,11 +23,11 @@ export class ClientMapper {
       retired: formValue.retired,
       monthlyIncome: formValue.monthlyIncome,
       passport: {
-        passportIssuedDate: ClientMapper.formatDate(formValue.passportIssuedDate),
+        passportIssuedDate: DateUtils.formatDate(formValue.passportIssuedDate),
         passportId: formValue.passportId,
         passportNumber: formValue.passportNumber,
         placeOfBirth: formValue.placeOfBirth,
-        passportAddress: formValue.passportNumber,
+        passportAddress: formValue.passportAddress,
         passportSeries: formValue.passportSeries,
         passportIssuer: formValue.passportIssuer
       }
@@ -58,14 +59,5 @@ export class ClientMapper {
       passportSeries: client.passport.passportSeries,
       passportIssuer: client.passport.passportIssuer
     };
-  }
-
-  private static formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const monthString = month > 9 ? month.toString() : '0' + month;
-    const day = date.getDate();
-    const dayString = day > 9 ? day : '0' + day;
-    return `${year}-${monthString}-${dayString}`;
   }
 }
