@@ -6,6 +6,7 @@ import { DepositType } from "../model/deposit-type";
 import { DepositCurrency } from "../model/deposit-currency";
 import { Page } from "../../shared/models/page";
 import { AddDepositAgreementDto } from "../model/add-deposit-agreement-dto";
+import { DateUtils } from "../../shared/utils/date-utils";
 
 @Injectable()
 export class DepositService {
@@ -23,5 +24,10 @@ export class DepositService {
 
   createAgreement(dto: AddDepositAgreementDto): Observable<void> {
     return this.httpClient.post<void>(`${environment.apiUrl}/deposit-agreements`, dto);
+  }
+
+  finishDayAt(date: Date): Observable<void> {
+    return this.httpClient.patch<void>(
+      `${environment.apiUrl}/deposit-agreements/finish?date=${DateUtils.formatDate(date)}`, null);
   }
 }
