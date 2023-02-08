@@ -5,7 +5,16 @@
   align-items: center;
 }
 
-.date-form {
+.accounts-filter {
   display: flex;
-  gap: 10px;
+  gap: 1rem
+}
+
+.date-form, .actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.table {
+  margin-top: 1rem;
 }

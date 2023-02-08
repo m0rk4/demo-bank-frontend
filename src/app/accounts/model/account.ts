@@ -9,4 +9,5 @@ export interface Account {
   credit: number;
   name: string;
   currencyType: Currency;
+  expiredTs: string;
 }

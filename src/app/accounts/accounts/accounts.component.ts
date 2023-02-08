@@ -22,6 +22,8 @@ import {
 } from "../../shared/confirmation-dialog/confirmation-dialog.component";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { DepositService } from "../service/deposit.service";
+import { DepositAgreementsDialogComponent } from "../deposit-agreements-dialog/deposit-agreements-dialog.component";
+import { DateUtils } from "../../shared/utils/date-utils";
 
 @UntilDestroy()
 @Component({
@@ -56,7 +58,8 @@ export class AccountsComponent {
     'activity',
     'debit',
     'credit',
-    'currency'
+    'currency',
+    'expired'
   ];
   readonly page$: BehaviorSubject<Page<Account>> = new BehaviorSubject<Page<Account>>({
     content: [],
@@ -97,14 +100,22 @@ export class AccountsComponent {
   }
 
   addDeposit(): void {
-    this.dialog.open(AddDepositDialogComponent, { width: '860px' });
+    this.dialog.open<AddDepositDialogComponent, unknown, unknown>(AddDepositDialogComponent, { width: '860px' })
+      .afterClosed()
+      .pipe(untilDestroyed(this))
+      .subscribe(() => this.reloadAccounts$.next(null));
   }
 
   finishWorkingDay(): void {
     const date = this.dateForm.controls.date.value;
     this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogModel, boolean>(
       ConfirmationDialogComponent,
-      { data: { title: 'Confirm action', message: 'Are you sure you want to finish working day at ' + date } }
+      {
+        data: {
+          title: 'Confirm action',
+          message: 'Are you sure you want to finish working day at ' + DateUtils.formatDate(date) + '.'
+        }
+      }
     ).afterClosed()
       .pipe(
         filter(confirmed => !!confirmed),
@@ -115,5 +126,10 @@ export class AccountsComponent {
         next: () => this.reloadAccounts$.next(null),
         error: err => this.snackBar.open(err.error.message, 'Ok', { duration: 3000 })
       });
+  }
+
+  viewDeposits(): void {
+    this.dialog.open(DepositAgreementsDialogComponent).afterClosed().pipe(untilDestroyed(this))
+      .subscribe(() => this.reloadAccounts$.next(null));
   }
 }

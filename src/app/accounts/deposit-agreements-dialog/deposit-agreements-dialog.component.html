@@ -1,0 +1,62 @@
+<h1 mat-dialog-title>Deposit Agreements</h1>
+<div mat-dialog-content>
+  <ng-container *ngIf="page$ | async as page">
+
+    <h3 *ngIf="page.content.length === 0">There are no active deposit agreements.</h3>
+    <table mat-table [dataSource]="page.content" [trackBy]="trackAgreements" class="mat-elevation-z8">
+
+      <ng-container matColumnDef="number">
+        <th mat-header-cell *matHeaderCellDef>Number</th>
+        <td mat-cell *matCellDef="let element">{{element.number}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="startDate">
+        <th mat-header-cell *matHeaderCellDef>Start Date</th>
+        <td mat-cell *matCellDef="let element"> {{element.startDate}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="endDate">
+        <th mat-header-cell *matHeaderCellDef>End Date</th>
+        <td mat-cell *matCellDef="let element"> {{element.endDate}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="currency">
+        <th mat-header-cell *matHeaderCellDef>Currency</th>
+        <td mat-cell *matCellDef="let element"> {{element.depositCurrency.currencyType.name}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="deposit">
+        <th mat-header-cell *matHeaderCellDef>Deposit</th>
+        <td mat-cell *matCellDef="let element"> {{element.depositCurrency.depositType.name}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="client">
+        <th mat-header-cell *matHeaderCellDef>Client</th>
+        <td mat-cell
+            *matCellDef="let element"> {{element.client.lastname + ' ' + element.client.firstname + ' ' + element.client.patronymic}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button aria-label="Close button" (click)="closeAgreement(element.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="DEPOSIT_AGREEMENT_COLUMNS"></tr>
+      <tr mat-row *matRowDef="let row; columns: DEPOSIT_AGREEMENT_COLUMNS;"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="pageSizeOptions"
+                   [pageIndex]="page.number"
+                   [length]="page.totalElements"
+                   showFirstLastButtons
+                   aria-label="Select page of agreements">
+    </mat-paginator>
+  </ng-container>
+</div>
+<div mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="null">Cancel</button>
+</div>

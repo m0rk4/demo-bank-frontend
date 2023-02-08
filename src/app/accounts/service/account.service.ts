@@ -11,6 +11,6 @@ export class AccountService {
   constructor(private httpClient: HttpClient) {}
 
   getAccounts(name: string, page: number, size: number): Observable<Page<Account>> {
-    return this.httpClient.get<Page<Account>>(`${environment.apiUrl}/accounts?page=${page}&size=${size}&name=${name}`);
+    return this.httpClient.get<Page<Account>>(`${environment.apiUrl}/accounts?page=${page}&size=${size}&name=${name}&sort=name`);
   }
 }

@@ -186,7 +186,7 @@ export class AddDepositDialogComponent implements OnInit {
 
   save(): void {
     const formValue: AddDepositFormValue = this.form.getRawValue();
-    this.depositService.createAgreement(AccountMapper.toAgreementDto(formValue)).pipe(untilDestroyed(this))
+    this.depositService.createDepositAgreement(AccountMapper.toAgreementDto(formValue)).pipe(untilDestroyed(this))
       .subscribe({
         next: () => this.dialogRef.close(),
         error: err => {
